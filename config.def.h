@@ -62,10 +62,10 @@ static const char unknown_str[] = "?";
  * wifi_essid          WiFi ESSID                      interface name (wlan0)
  */
 static struct arg args[] = {
-  /* function          interval(sec)  format             argument                                                                                   last call   last res */
-  { wifi_essid,        10,            "%s | ",           "wlp59s0",                                                                                 { 0 },      { '\0'} },
-  { battery_perc,      120,           "%s%% | ",         "BAT0",                                                                                    { 0 },      { '\0'} },
-  { ram_used,          5,             "%s | ",           NULL,                                                                                      { 0 },      { '\0'} },
-  { run_command,       5,             "%s | ",           "amixer get Master | sed -n 's/^.*\\[\\([0-9]\\+%\\).*\\[\\(o.*\\)\\].*$/\\1/p'",          { 0 },      { '\0'} },
-  { datetime,          30,            "%s",              "%a %d %b %H:%M",                                                                          { 0 },      { '\0'} }
+  /* function          interval(sec)  format             argument                                                                          */
+  { wifi_essid,        10,            "%s | ",           "wlp59s0",                                                                         },
+  { battery_perc,      120,           "%s%% | ",         "BAT0",                                                                            },
+  { ram_used,          5,             "%s | ",           NULL,                                                                              },
+  { run_command,       5,             "%s | ",           "amixer get Master | sed -n 's/^.*\\[\\([0-9]\\+%\\).*\\[\\(o.*\\)\\].*$/\\1/p'",  },
+  { datetime,          30,            "%s",              "%a %d %b %H:%M",                                                                  }
 };
