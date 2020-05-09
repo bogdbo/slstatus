@@ -12,8 +12,10 @@ X11LIB = /usr/lib/X11
 
 # flags
 CPPFLAGS = -I$(X11INC) -D_DEFAULT_SOURCE
-CFLAGS   = -g -std=c99 -pedantic -Wall -Wextra
-LDFLAGS  = -L$(X11LIB)
+#CFLAGS   = -g -std=c99 -pedantic -Wall -Wextra
+CFLAGS   = -std=c99 -pedantic -Wall -Wextra -Os
+#LDFLAGS  = -L$(X11LIB)
+LDFLAGS  = -L$(X11LIB) -s
 LDLIBS   = -lX11
 
 # compiler and linker

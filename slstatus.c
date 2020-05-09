@@ -18,7 +18,7 @@ struct arg {
 	const char *args;
 	// note: I chose to do it here to avoid any heap allocations, even though it's not the right place
 	struct timespec lastcall; 
-	const char lastres[1024];
+	char lastres[1024];
 };
 
 char buf[1024];
