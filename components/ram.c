@@ -1,5 +1,6 @@
 /* See LICENSE file for copyright and license details. */
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../util.h"
 
@@ -9,23 +10,23 @@
 	const char *
 	ram_free(void)
 	{
-		uintmax_t free;
+		uintmax_t freem;
 
 		if (pscanf("/proc/meminfo",
 		           "MemTotal: %ju kB\n"
 		           "MemFree: %ju kB\n"
 		           "MemAvailable: %ju kB\n",
-		           &free, &free, &free) != 3) {
+		           &freem, &freem, &freem) != 3) {
 			return NULL;
 		}
 
-		return fmt_human(free * 1024, 1024);
+		return fmt_human(freem * 1024, 1024);
 	}
 
 	const char *
 	ram_perc(void)
 	{
-		uintmax_t total, free, buffers, cached;
+		uintmax_t total, freem, buffers, cached;
 
 		if (pscanf("/proc/meminfo",
 		           "MemTotal: %ju kB\n"
@@ -33,7 +34,7 @@
 		           "MemAvailable: %ju kB\n"
 		           "Buffers: %ju kB\n"
 		           "Cached: %ju kB\n",
-		           &total, &free, &buffers, &buffers, &cached) != 5) {
+		           &total, &freem, &buffers, &buffers, &cached) != 5) {
 			return NULL;
 		}
 
@@ -41,7 +42,7 @@
 			return NULL;
 		}
 
-		return bprintf("%d", 100 * ((total - free) - (buffers + cached))
+		return bprintf("%d", 100 * ((total - freem) - (buffers + cached))
                                / total);
 	}
 
@@ -61,20 +62,49 @@
 	const char *
 	ram_used(void)
 	{
-		uintmax_t total, free, buffers, cached;
+    uintmax_t total, freem, buffers, cached, slab_reclaimable;
 
-		if (pscanf("/proc/meminfo",
-		           "MemTotal: %ju kB\n"
-		           "MemFree: %ju kB\n"
-		           "MemAvailable: %ju kB\n"
-		           "Buffers: %ju kB\n"
-		           "Cached: %ju kB\n",
-		           &total, &free, &buffers, &buffers, &cached) != 5) {
-			return NULL;
-		}
+    FILE * fp;
+    char * line = NULL;
+    size_t len = 0;
 
-		return fmt_human((total - free - buffers - cached) * 1024,
-		                 1024);
+    fp = fopen("/proc/meminfo", "r");
+    if (fp == NULL)
+      return 0;
+
+    int i = 0;
+    while (getline(&line, &len, fp) != -1 && i <= 23) {
+      switch (i) {
+        case 0:
+          sscanf(line, "MemTotal: %ju kB\n", &total);
+          break;
+        case 1:
+          sscanf(line, "MemFree: %ju kB\n", &freem);
+          break;
+        case 3:
+          sscanf(line, "Buffers: %ju kB\n", &buffers);
+          break;
+        case 4:
+          sscanf(line, "Cached: %ju kB\n", &cached);
+          break;
+        case 23:
+          sscanf(line, "SReclaimable: %ju kB\n", &slab_reclaimable);
+          break;
+      } 
+        
+      i++;
+    }
+
+    if (line)
+      free(line);
+
+    fclose(fp);
+
+    // https://gitlab.com/procps-ng/procps/-/blob/master/proc/sysinfo.c#L781
+    cached += slab_reclaimable;
+
+    // https://gitlab.com/procps-ng/procps/-/blob/master/proc/sysinfo.c#L789
+		return fmt_human((total - freem - buffers - cached) * 1024, 1024);
 	}
 #elif defined(__OpenBSD__)
 	#include <stdlib.h>
