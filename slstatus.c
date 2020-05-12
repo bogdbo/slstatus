@@ -97,7 +97,8 @@ main(int argc, char *argv[])
 					res = unknown_str;
 				}
 				last[i].time = start;
-				strncpy(last[i].res, res, strlen(res));
+				last[i].res[0] = '\0';
+				strncat(last[i].res, res, strlen(res));
 			} else {
 				res = last[i].res;
 			}
